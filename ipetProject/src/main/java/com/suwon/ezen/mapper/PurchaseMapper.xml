@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.suwon.ezen.mapper.PurchaseMapper">
+	<insert id="purchase" parameterType="com.suwon.ezen.vo.PurchaseVO">
+		insert into ipetPurchase(mno,pno,pname,price,amount,total,id) values (#{mno},#{pno},#{pname},#{price},#{amount},#{total},#{id})
+	</insert>
+	<select id="getPurchaseList" resultType="com.suwon.ezen.vo.PurchaseVO">
+		select * from ipetPurchase where mno=#{mno} order by paydate desc limit 15 offset #{offset}
+	</select>
+	
+	<select id="getCountPurchase" resultType="int">
+		select count(*) from ipetPurchase where mno=#{mno}
+	</select>
+	
+	<select id="getAllPurchaseList" resultType="com.suwon.ezen.vo.PurchaseVO" parameterType="com.suwon.ezen.vo.PurchaseVO">
+		<choose>
+			<when test="delivery == null">
+				select * from ipetPurchase order by paydate desc limit 15 offset #{offset}
+			</when>
+			<otherwise>
+				select * from ipetPurchase where delivery=#{delivery} order by paydate desc limit 15 offset #{offset}
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="getAllCountPurchase" resultType="int" parameterType="com.suwon.ezen.vo.PurchaseVO" >
+		<choose>
+			<when test="delivery == null">
+				select count(*) from ipetPurchase
+			</when>
+			<otherwise>
+				select count(*) from ipetPurchase where delivery=#{delivery}
+			</otherwise>
+		</choose>
+		
+	</select>
+	<update id="changeDelivery" parameterType="com.suwon.ezen.vo.PurchaseVO">
+		update ipetPurchase set delivery=#{delivery} where purchaseNo=#{purchaseNo}
+	</update>
+	
+	<select id="getCountCategory" resultType="int">
+		select count(product.category) from ipetPurchase as purchase inner join ipetproduct as product on purchase.pno = product.pno where product.category=#{category}
+	</select>
+	
+	<select id="getTop5" resultType="hashmap">
+		select product.pno,product.pname,sum(purchase.amount) as amount
+		from ipetPurchase as purchase 
+		inner join ipetProduct as product on purchase.pno=product.pno
+		group by(purchase.pno) order by amount desc limit 5 offset 0;
+	</select>
+	<select id="getSalesRate" resultType="hashmap">
+		select DATE_FORMAT(paydate,'%Y-%m-%d') as paydate,
+		sum(amount) as sales from ipetPurchase
+		group by DATE_FORMAT(paydate,'%Y-%m-%d')
+		order by paydate asc
+	</select>
+</mapper>

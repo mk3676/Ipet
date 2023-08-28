@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.suwon.ezen.mapper.ProductMapper">
+
+	<insert  id="productInsert" parameterType="com.suwon.ezen.vo.ProductVO">
+  		insert into ipetProduct(pno,id,category,pname,price,description,regtime) values (null,#{id},#{category},#{pname},#{price},#{description},default)
+  		<selectKey keyProperty="pno" resultType="int" order="AFTER">
+    		select LAST_INSERT_ID()
+   	 	</selectKey>
+   	 	
+	</insert>
+	
+	<update id="imageInsert" parameterType="com.suwon.ezen.vo.ProductVO">
+		update ipetProduct set imageName=#{imageName},imagePath=#{imagePath}
+			where pno=#{pno} and id=#{id}
+	</update>
+	
+	<select id="productList" resultType="com.suwon.ezen.vo.ProductVO">
+		select * from ipetProduct order by pno desc limit 15 offset #{offset}
+	</select>
+	
+	<select id="productCount" resultType="int">
+		select count(*) from ipetProduct
+	</select>
+	
+	<select id="getProduct" resultType="com.suwon.ezen.vo.ProductVO">
+		select * from ipetProduct where pno=#{pno}
+	</select>
+	
+	<update id="productUpdate" parameterType="com.suwon.ezen.vo.ProductVO">
+		update ipetProduct set category=#{category},pname=#{pname},price=#{price},
+		description=#{description}, updateTime=now() where pno=#{pno}
+	</update>
+	
+	<delete id="deleteProduct" parameterType="int">
+		delete from ipetProduct where pno=#{pno}
+	</delete>
+	
+	<select id="getProductsbyCategory" resultType="com.suwon.ezen.vo.ProductVO">
+		select * from ipetProduct where category=#{category} order by pno desc limit 15 offset #{offset}
+	</select>
+	
+	<select id="getCountbyCategory" resultType="int">
+		select count(*) from ipetProduct where category=#{category}
+	</select>
+	
+	<!-- Top6 -->
+	<select id="findTop6Product" resultType="com.suwon.ezen.vo.ProductVO">
+		select purchase.pno, purchase.pname,  purchase.price,product.imageName
+			from ipetPurchase as purchase inner join ipetProduct as product on product.pno = purchase.pno
+			group by purchase.pname order by sum(purchase.amount) desc limit 6 offset 0;
+	</select>
+</mapper>

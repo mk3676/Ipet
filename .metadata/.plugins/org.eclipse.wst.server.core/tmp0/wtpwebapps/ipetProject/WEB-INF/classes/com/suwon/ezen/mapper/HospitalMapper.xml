@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "//mybatis.org/DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.suwon.ezen.mapper.HospitalMapper">
+	<select id="getAll" resultType="com.suwon.ezen.vo.HospitalVO">
+		select * from pethospital
+	</select>
+	
+	<select id="getByAddress" resultType="com.suwon.ezen.vo.HospitalVO">
+		select * from pethospital where left(address,5) like CONCAT('%',#{address},'%')
+	</select>
+	<select id="countByAddress" resultType="int">
+		select count(*) from pethospital where left(address,5) like CONCAT('%',#{address},'%')
+	</select>
+	<select id="getByAddressPaging" resultType="com.suwon.ezen.vo.HospitalVO" >
+		select * from pethospital where left(address,5) like CONCAT('%',#{address},'%') limit 15 offset #{offset}
+	</select>
+	<select id="getBysearchAddressPaging" resultType="com.suwon.ezen.vo.HospitalVO">
+		select * from (select * from pethospital where left(address,5) like CONCAT('%',#{address},'%')) result
+		where address like CONCAT('%',#{searchAddress},'%') limit 15 offset #{offset}
+	</select>
+	
+	<select id="countBysearchAddress" resultType="int">
+		select count(*) from (select * from pethospital where left(address,5) like CONCAT('%',#{address},'%')) result
+		where address like CONCAT('%',#{searchAddress},'%')
+	</select>
+	<select id="getBysearchNamePaging" resultType="com.suwon.ezen.vo.HospitalVO">
+		select * from (select * from pethospital where left(address,5) like CONCAT('%',#{address},'%')) result
+		where name like CONCAT('%',#{searchName},'%') limit 15 offset #{offset}
+	</select>
+	
+	<select id="countBysearchName" resultType="int">
+		select count(*) from (select * from pethospital where left(address,5) like CONCAT('%',#{address},'%')) result
+		where name like CONCAT('%',#{searchName},'%')
+	</select>
+</mapper>
+  

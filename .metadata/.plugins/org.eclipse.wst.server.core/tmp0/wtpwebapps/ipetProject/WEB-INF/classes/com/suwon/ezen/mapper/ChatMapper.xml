@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.suwon.ezen.mapper.ChatMapper">
+	<insert id="insertChat" parameterType="com.suwon.ezen.vo.ChatVO">
+		insert into ipetChat values (#{id},#{contents},default,default)
+	</insert>
+	
+	<select id="getMemberLastChat" resultType="com.suwon.ezen.vo.ChatVO">
+		SELECT c.id, c.contents, c.insertDate, c.readCheck
+		FROM ipetChat AS c
+		INNER JOIN ipetMember AS m ON c.id = m.id and m.auth='m'
+		WHERE (c.id, c.insertDate) IN (
+		    SELECT id, MAX(insertDate)
+		    FROM ipetChat
+		    GROUP BY id
+		) order by insertDate desc limit 15 offset #{offset}
+	</select>
+	<select id="getChatList" parameterType="String" resultType="String">
+		select contents from ipetChat where id = #{id} order by insertDate asc;
+	</select>
+	
+	<update id="readChat" parameterType="String">
+		update ipetChat set readCheck='r' where id=#{id}
+	</update>
+	
+	<select id="getMemberUnReadChat" resultType="com.suwon.ezen.vo.ChatVO">
+		SELECT c.id, c.contents, c.insertDate, c.readCheck
+		FROM ipetChat AS c
+		INNER JOIN ipetMember AS m ON c.id = m.id and m.auth='m'
+		WHERE (c.id, c.insertDate) IN (
+		    SELECT id, MAX(insertDate)
+		    FROM ipetChat
+		    GROUP BY id having readCheck='n'
+		) order by insertDate desc limit 15 offset #{offset}
+	</select>
+	<select id="getMemberCountLastChat" resultType="int">
+		SELECT count(*)
+		FROM ipetChat AS c
+		INNER JOIN ipetMember AS m ON c.id = m.id and m.auth='m'
+		WHERE (c.id, c.insertDate) IN (
+		    SELECT id, MAX(insertDate)
+		    FROM ipetChat
+		    GROUP BY id
+		) order by insertDate desc;
+		
+	</select>
+	<select id="getMemberCountUnReadChat" resultType="int">
+		SELECT count(*)
+		FROM ipetChat AS c
+		INNER JOIN ipetMember AS m ON c.id = m.id and m.auth='m'
+		WHERE (c.id, c.insertDate) IN (
+		    SELECT id, MAX(insertDate)
+		    FROM ipetChat
+		    GROUP BY id having readCheck='n'
+		) order by insertDate desc;
+		
+	</select>
+	<delete id="deleteQna" parameterType="String">
+		delete from ipetChat where id=#{id}
+	</delete>
+</mapper>

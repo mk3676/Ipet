@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.suwon.ezen.mapper.BoardMapper">
+	<!-- 전체 목록 가져오기 -->
+ 	<select id="getAllContent" resultType="com.suwon.ezen.vo.BoardVO">
+ 		select * from board order by bno desc limit 15 offset #{offset}
+ 	</select>
+ 
+ 	<!-- 새 글 하나 추가하기 -->
+ 	<insert id="insertContent" parameterType="com.suwon.ezen.vo.BoardVO">
+ 		insert into board(title, content, writer, imagePath, imageName) values(#{title}, #{content}, #{writer}, #{imagePath}, #{imageName})
+ 	</insert>
+ 
+ 	<!-- 글 하나 가져오기 -->
+  	<select id="getOneContent" resultType="com.suwon.ezen.vo.BoardVO">
+ 		select * from board where bno = #{bno}
+ 	</select>
+ 
+ 	<!-- 글 수정하기 -->
+ 	<update id="modifyContent" parameterType="com.suwon.ezen.vo.BoardVO">
+ 		update board set title = #{title}, content = #{content}, writer = #{writer}, imagePath = #{imagePath}, imageName = #{imageName}, updateDate = now() where bno = #{bno}
+ 	</update>
+ 
+	 <!-- 글 삭제하기 -->
+	 <delete id="deleteContent">
+	 	delete from board where bno = #{bno}
+	 </delete>
+	 
+	 <!-- 글 모두 삭제하기(key: bno) -->
+	 <delete id="deleteAllReplyByBno">
+	 	delete from reply where bno = #{bno}
+	 </delete>
+	 
+	 <select id="getCount" resultType="int">
+	 	select count(*) from board
+	 </select>
+
+	<!-- 댓글 추가하기 -->
+	<insert id="insertReply" parameterType="com.suwon.ezen.vo.ReplyVO">
+ 		<selectKey keyProperty="rno" resultType="int" order="AFTER">
+    		select LAST_INSERT_ID()
+ 		</selectKey>
+ 			insert into reply(bno, id, reply, imagePath, imageName) values(#{bno}, #{id}, #{reply}, #{imagePath}, #{imageName})
+ 	</insert>
+ 
+	<!-- 댓글 모두 가져오기(key: bno) -->
+ 	<select id="getAllReply" resultType="com.suwon.ezen.vo.ReplyVO">
+ 		select * from reply where bno = #{bno}
+ 	</select>
+ 
+ 	<!-- 댓글 하나 가져오기 --> 
+ 	<select id="getOneReply" resultType="com.suwon.ezen.vo.ReplyVO">
+ 		select * from reply where rno = #{rno}
+ 	</select>
+ 
+ 	<!-- 댓글 수정하기 -->
+ 	<update id="modifyReply" parameterType="com.suwon.ezen.vo.ReplyVO">
+ 		update reply set reply = #{reply}, imagePath = #{imagePath}, imageName = #{imageName} where bno = #{bno} and rno = #{rno}
+ 	</update>
+ 	
+	<!-- 댓글 삭제하기 -->
+ 	<delete id="deleteReply">
+ 		delete from reply where rno = #{rno}
+ 	</delete>
+
+	<!-- 검색하기 -->
+	<select id="searchList" parameterType="com.suwon.ezen.vo.BoardVO" resultType="com.suwon.ezen.vo.BoardVO">
+		<choose>
+			<when test="searchOption == 1">
+				select * from board where title like CONCAT('%', #{searchCondition}, '%') limit 15 offset #{offset}
+			</when>
+			<when test="searchOption == 2">
+				select * from board where content like CONCAT('%', #{searchCondition}, '%') limit 15 offset #{offset}
+			</when>
+			<when test="searchOption == 3">
+				select * from board where writer = #{searchCondition} limit 15 offset #{offset}
+			</when>
+		</choose>
+	</select>
+
+	<!-- 검색 조건에 맞는 게시물의 갯수 구하기 -->
+	<select id="searchListCount" parameterType="com.suwon.ezen.vo.BoardVO" resultType="int">
+		<choose>
+			<when test="searchOption == 1">
+				select count(*) from board where title like CONCAT('%', #{searchCondition}, '%')
+			</when>
+			<when test="searchOption == 2">
+				select count(*) from board where content like CONCAT('%', #{searchCondition}, '%')
+			</when>
+			<when test="searchOption == 3">
+				select count(*) from board where writer = #{searchCondition}
+			</when>
+		</choose>
+	</select>
+</mapper>

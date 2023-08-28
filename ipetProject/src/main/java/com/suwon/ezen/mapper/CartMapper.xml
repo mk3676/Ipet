@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.suwon.ezen.mapper.CartMapper">
+	<insert id="insertCart" parameterType="com.suwon.ezen.vo.CartVO">
+		insert into ipetCart values(#{mno},#{pno},#{id},#{pname},#{price},#{imageName},#{category})
+	</insert>
+	
+	<select id="getCartList" resultType="com.suwon.ezen.vo.CartVO">
+		select * from ipetCart where mno=#{mno} limit 15 offset #{offset}
+	</select>
+	
+	<select id="getCountCart" resultType="int">
+		select count(*) from ipetCart where mno=#{mno}
+	</select>
+	<delete id="deleteCart" parameterType="int">
+		delete from ipetCart where pno=#{pno}
+	</delete>
+	
+	<select id="checkCart" parameterType="int" resultType="String">
+		select * from ipetCart where pno=#{pno} and mno=#{mno}
+	</select>
+	
+	<delete id="deleteCartFromMno" parameterType="int">
+		delete from ipetCart where pno=#{pno} and mno=#{mno}
+	</delete>
+	
+	<delete id="deleteCartAll" parameterType="int">
+		delete from ipetCart where mno=#{mno}
+	</delete>
+</mapper>
